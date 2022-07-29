@@ -45,8 +45,8 @@ if uploaded_file is not None:
     except ValueError as e:
         st.write(f"Project has been already initialized.")
         pass
-    if app:
-        db = firestore.client(app)
+    if not db and st.session_state.get("app", None):
+        db = firestore.client(st.session_state.get("app", None))
         st.session_state["db"] = db
     else:
         st.write("App does not exist")
