@@ -24,8 +24,8 @@ st.title("NYATApp exporter")
 
 uploaded_file = st.file_uploader("Choose a file")
 
-db = None 
-app = None
+db = st.session_state.get("db", None) 
+app = st.session_state.get("app", None)
 
 if uploaded_file is not None:
 
@@ -37,6 +37,7 @@ if uploaded_file is not None:
     cred = credentials.Certificate(config)
     try:
         app = initialize_app(cred, name = uploaded_file.name)
+        st.session_state["app"] = app
         st.write(f"Project has been initialized: {app.project_id}")
     except AlreadyExistsError as e:
         st.write(f"Project has been already initialized.")
@@ -46,6 +47,7 @@ if uploaded_file is not None:
         pass
     if app:
         db = firestore.client(app)
+        st.session_state["db"] = db
     else:
         st.write("App does not exist")
 
