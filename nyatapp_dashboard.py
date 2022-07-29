@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 from io import StringIO, BytesIO
 import json
-from firebase_admin import credentials, firestore, auth, initialize_app
+from firebase_admin import credentials, firestore, auth, initialize_app, 
 from firebase_admin.exceptions import AlreadyExistsError
 
 
@@ -25,6 +25,7 @@ st.title("NYATApp exporter")
 uploaded_file = st.file_uploader("Choose a file")
 
 db = None 
+app = None
 
 if uploaded_file is not None:
 
@@ -43,7 +44,10 @@ if uploaded_file is not None:
     except ValueError as e:
         st.write(f"Project has been already initialized.")
         pass
-    db = firestore.client()
+    if app:
+        db = firestore.client(app)
+    else:
+        st.write("App does not exist")
 
 if db:
     collections = [x.id for x in db.collections()]
