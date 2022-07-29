@@ -1,9 +1,9 @@
-import streamlit as st
-import pandas as pd
 from io import StringIO, BytesIO
 import json
+from time import time
+import streamlit as st
+import pandas as pd
 from firebase_admin import credentials, firestore, auth, initialize_app
-from firebase_admin.exceptions import AlreadyExistsError
 
 
 def export_collection(db, coll_id):
@@ -35,21 +35,14 @@ if uploaded_file is not None:
     config = json.load(stringio)
 
     cred = credentials.Certificate(config)
-    try:
-        app = initialize_app(cred, name = uploaded_file.name)
+    
+    if st.session_state.get("lastly_used_filename", None) != uploaded_file.name or not app:
+        app = initialize_app(cred, name=f"v_{int(time())}")
         st.session_state["app"] = app
-        st.write(f"Project has been initialized: {app.project_id}")
-    except AlreadyExistsError as e:
-        st.write(f"Project has been already initialized.")
-        pass
-    except ValueError as e:
-        st.write(f"Project has been already initialized.")
-        pass
-    if not db and st.session_state.get("app", None):
-        db = firestore.client(st.session_state.get("app", None))
-        st.session_state["db"] = db
-    else:
-        st.write("App does not exist")
+        st.session_state["lastly_used_filename"] = uploaded_file.name
+    st.write(f"Project has been initialized: {app.project_id} {app.name}")
+    db = firestore.client(app)
+    st.session_state["db"] = db
 
 if db:
     collections = [x.id for x in db.collections()]
