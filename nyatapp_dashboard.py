@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 from io import StringIO, BytesIO
 import json
-from firebase_admin import credentials, firestore, auth, initialize_app, 
+from firebase_admin import credentials, firestore, auth, initialize_app
 from firebase_admin.exceptions import AlreadyExistsError
 
 
